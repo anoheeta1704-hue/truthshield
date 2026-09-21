@@ -22,3 +22,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# antigravity rules
+.agents/rules
+
+# Python / Backend
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+backend/models/*.json
+backend/models/voice_clone/
+backend/data/

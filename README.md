@@ -1,16 +1,27 @@
-# React + Vite
+# TruthShield
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TruthShield is an AI-based audio deception analysis system. It analyzes audio conversations using multiple AI/ML signals (Voice Stress, NLP Inconsistency, Voice Clone Detection) and combines them into a unified analysis result.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The project consists of a React (Vite) frontend and a FastAPI backend.
 
-## React Compiler
+### Frontend Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+### Backend Setup (Milestone 2+)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+cd backend
+python -m venv venv
+# Windows: venv\Scripts\activate
+# Unix: source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+*Note: Models and datasets will be required for later milestones. See the respective service documentation in `backend/app/services/` for details.*
