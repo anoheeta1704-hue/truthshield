@@ -1,31 +1,53 @@
-"""
-Voice Stress Analysis Service
+import os
+import json
+import numpy as np
+import xgboost as xgb
+from app.services.feature_extraction import extract_features
 
-Analyzes acoustic characteristics of speech to identify stress-related patterns.
+# The path where the trained model should be stored
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "models", "voice_stress_xgb.json")
 
-Dataset: RAVDESS (Ryerson Audio-Visual Database of Emotional Speech and Song)
-  - Place the RAVDESS dataset in: backend/data/ravdess/
-  - Expected structure: Actor_XX/ directories containing .wav files
-  - Download from: https://zenodo.org/record/1188976
-  - Do NOT commit the dataset to git (it is in .gitignore).
+class ModelUnavailableError(Exception):
+    """Raised when the pretrained model is not available."""
+    pass
 
-Audio Processing: Librosa
+class VoiceStressService:
+    def __init__(self):
+        self.model = None
+        self._load_model()
 
-Features to extract:
-  - MFCC (Mel-Frequency Cepstral Coefficients)
-  - Pitch (Fundamental Frequency F0)
-  - Jitter (Pitch perturbation)
-  - Shimmer (Amplitude perturbation)
-  - Zero Crossing Rate (ZCR)
+    def _load_model(self):
+        """Loads the XGBoost model if it exists."""
+        if os.path.exists(MODEL_PATH):
+            self.model = xgb.XGBClassifier()
+            self.model.load_model(MODEL_PATH)
+        else:
+            self.model = None
 
-Model: XGBoost classifier
-  - Trained model saved to: backend/models/voice_stress_xgb.json
-  - Training script: TBD in Milestone 3
+    def is_model_available(self) -> bool:
+        return self.model is not None
 
-Output: Normalized stress score (0.0 to 1.0)
+    def analyze(self, audio_buffer: bytes) -> dict:
+        """
+        Analyzes the audio buffer for voice stress.
+        Returns a dictionary with the analysis score.
+        """
+        # Extract features first (this validates the audio)
+        features = extract_features(audio_buffer)
 
-IMPORTANT: This is an AI-assisted signal indicator, NOT definitive proof of deception.
-The system must describe results as probabilities and indicators.
+        if not self.is_model_available():
+            raise ModelUnavailableError("The voice stress model is not trained or available.")
 
-Implementation: Milestone 3 (Voice Stress Analysis)
-"""
+        # XGBoost expects 2D array: (n_samples, n_features)
+        X = features.reshape(1, -1)
+
+        # Predict probability of class 1 (Stress)
+        prob = self.model.predict_proba(X)[0][1]
+
+        return {
+            "score": float(prob),
+            "status": "success"
+        }
+
+# Singleton instance
+voice_stress_service = VoiceStressService()

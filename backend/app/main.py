@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import health
+from app.api import health, analyze
 from app.config import settings
 
 app = FastAPI(
@@ -20,8 +20,8 @@ app.add_middleware(
 
 # Register routers
 app.include_router(health.router, tags=["health"])
+app.include_router(analyze.router, prefix="/analyze", tags=["analyze"])
 
 # Stubs for future milestones
-# app.include_router(analyze.router, prefix="/analyze", tags=["analyze"])
 # app.include_router(sessions.router, prefix="/sessions", tags=["sessions"])
 # app.include_router(stream.router, prefix="/stream", tags=["stream"])
